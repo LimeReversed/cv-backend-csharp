@@ -1,9 +1,12 @@
 ﻿using Microsoft.Data.Sqlite;
 using System.Diagnostics;
 using System.Text;
+using System.Collections.Generic;
 
 namespace BackendCSharp.Database
 {
+   
+
     public class ColumnEntry
     {
         public string Column { get; private set; }
@@ -43,7 +46,8 @@ namespace BackendCSharp.Database
 
     public static class Db
     {
-        static public string connectionString = @"Data Source = E:\Programs\CV\backend-c#\Database\ResumeDatabase.db3";
+        //static public string connectionString = @"Data Source = E:\Programs\CV\backend-c#\Database\ResumeDatabase.db3";
+        static public string connectionString = @"Data Source = C:\Emil\Backup\Programs\CV\cv-backend-csharp\Database\ResumeDatabase.db3";
 
         /// <summary>
         /// Adds parameters to the existing command.
