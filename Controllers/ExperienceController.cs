@@ -24,7 +24,7 @@ public class ExperienceController : ControllerBase
         var rawResult = Db.GetRows(query);
         var result = new List<Experience>();
         foreach (var row in rawResult) {
-            result.Add(new Experience(Convert.ToInt32(row["id"]), row["title"], row["org_name"], row["location"], row["from"], row["to"], row["tldr"], new List<int>(), new List<Project>()));
+            result.Add(new Experience(Convert.ToInt32(row["id"]), row["title"], row["org_name"], row["location"], row["from"], row["to"], row["tldr"], new List<Tag>(), new List<Project>()));
         }
 
         foreach (Experience experience in result)
@@ -53,15 +53,35 @@ public class ExperienceController : ControllerBase
                 var values = projectID.TryGetValue("project_id", out value);
                 projectIDs.Add(Convert.ToInt16(value));
             }
-
+            
             string projectsQuery = $"SELECT * FROM Projects WHERE id IN ({projectIDs.AsString()})";
             var projectsRaw = Db.GetRows(projectsQuery);
 
+            string tagsIdsQuery = $"SELECT tag_id FROM ExperienceXTags WHERE experience_id = {experience.Id}";
+            var tagIdsRaw = Db.GetRows(tagsIdsQuery);
+
+            List<int > tagIds = new List<int>();
+
+            foreach (Dictionary<string, string> tagsID in tagIdsRaw) {
+                string value = "";
+                var values = tagsID.TryGetValue("tag_id", out value);
+                tagIds.Add(Convert.ToInt16(value));
+            }
+
+            string tagsQuery = $"SELECT * FROM Tags WHERE id IN ({tagIds.AsString()})";
+            var tagsRaw = Db.GetRows(tagsQuery);
+
+            foreach (Dictionary<string, string> tag in tagsRaw)
+            {
+                experience.Tags.Add(new Tag(Convert.ToInt16(tag["id"]), tag["name"], Convert.ToInt16(tag["level"]), tag["category"]));
+            }
+
+
             foreach (Dictionary<string, string> project in projectsRaw)
             {
-                var newProject = new Project(project["name"], project["description"], new List<string>(), project["link"]);
+                var newProject = new Project(Convert.ToInt16(project["id"]), project["name"], project["description"], new List<string>(), project["link"]);
 
-                string imagePathQuery = $"SELECT image_path FROM ProjectsXImagePath WHERE project_id = {project["id"]}";
+                string imagePathQuery = $"SELECT image_path FROM ProjectsXImagePaths WHERE project_id = {project["id"]}";
                 var imagePathsRaw = Db.GetRows(imagePathQuery);
 
                 foreach (Dictionary<string, string> path in imagePathsRaw)

@@ -2,7 +2,7 @@ namespace BackendCSharp.Models;
 
 public class Experience
 {
-    public Experience(int id, string title, string? orgName, string? location, string from, string? to, string? tldr, List<int> tags, List<Project> projects)
+    public Experience(int id, string title, string? orgName, string? location, string from, string? to, string? tldr, List<Tag> tags, List<Project> projects)
     {
         Id = id;
         Title = title;
@@ -22,6 +22,6 @@ public class Experience
     public string From { get; set; }
     public string? To { get; set; }
     public string? Tldr { get; set; }
-    public List<int> Tags { get; set; }
+    public List<Tag> Tags { get; set; }
     public List<Project> Projects { get; set; }
 }
