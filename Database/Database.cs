@@ -1,7 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
 using System.Diagnostics;
-using System.Text;
-using System.Collections.Generic;
 
 namespace BackendCSharp.Database
 {
@@ -153,6 +151,7 @@ namespace BackendCSharp.Database
 
                 while (reader.Read())
                 {
+
                     Dictionary<string, string> row = new Dictionary<string, string>();
 
                     for (int i = 0; i < reader.FieldCount; i++)

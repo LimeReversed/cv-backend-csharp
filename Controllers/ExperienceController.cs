@@ -17,19 +17,49 @@ public class ExperienceController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet(Name = "GetAllExperiences")]
+    [HttpGet()]
     public IEnumerable<Experience> Get()
     {
         string query = "SELECT * FROM Experience";
-        var rawResult = Db.GetRows(query);
-        var result = new List<Experience>();
-        foreach (var row in rawResult) {
-            result.Add(new Experience(Convert.ToInt32(row["id"]), row["title"], row["org_name"], row["location"], row["from"], row["to"], row["tldr"], new List<Tag>(), new List<Project>()));
-        }
+        return GetExperience(query);
 
-        foreach (Experience experience in result)
+    }
+
+    [HttpGet("jobs")]
+    public IEnumerable<Experience> GetJobs()
+    {
+        string query = "SELECT * FROM Experience WHERE type = 'Job'";
+        return GetExperience(query);
+        
+    }
+
+    [HttpGet("education")]
+    public IEnumerable<Experience> GetEducation()
+    {
+        string query = "SELECT * FROM Experience WHERE type = 'Education'";
+        return GetExperience(query);
+
+    }
+
+    [HttpGet("hobbies")]
+    public IEnumerable<Experience> GetHobbies()
+    {
+        string query = "SELECT * FROM Experience WHERE type = 'Hobbies'";
+        return GetExperience(query);
+
+    }
+
+    private IEnumerable<Experience> GetExperience(string query)
+    {
+        var experiences = ExperienceRepository.GetByQuery(query);
+        List<int> experienceIds = (List<int>)experiences.Select(x => x.Id);
+
+        // Maybe a join so I can get the project and experience_id in the same row? 
+        string projectIdsQuery = $"SELECT * FROM ExperienceXProjects WHERE experience_id IN ({experienceIds.AsString()})";
+
+        foreach (Experience experience in experiences)
         {
-            string projectIdsQuery = $"SELECT project_id FROM ExperienceXProjects WHERE experience_id={experience.Id}";
+            //string projectIdsQuery = $"SELECT project_id FROM ExperienceXProjects WHERE experience_id={experience.Id}";
             var projectIDsRaw = Db.GetRows(projectIdsQuery);
             // Need a wherein statement, but I can't just put a dic<string, string> there I need them separated by comma. 
 
@@ -43,6 +73,8 @@ public class ExperienceController : ControllerBase
 
             // Jag kan göra metod för att convertera till instans, men när det är en lista? Var lägger jag den koden?
 
+            // Ha repository? GetByID? Och så en repository för varje Model.Då kan jag få ett färdig objekt direkt. Men återigen, hur göra om lista av objekt?
+
             //Project[] projects = new Project[];
 
             List<int> projectIDs = new List<int>();
@@ -53,16 +85,17 @@ public class ExperienceController : ControllerBase
                 var values = projectID.TryGetValue("project_id", out value);
                 projectIDs.Add(Convert.ToInt16(value));
             }
-            
+
             string projectsQuery = $"SELECT * FROM Projects WHERE id IN ({projectIDs.AsString()})";
             var projectsRaw = Db.GetRows(projectsQuery);
 
             string tagsIdsQuery = $"SELECT tag_id FROM ExperienceXTags WHERE experience_id = {experience.Id}";
             var tagIdsRaw = Db.GetRows(tagsIdsQuery);
 
-            List<int > tagIds = new List<int>();
+            List<int> tagIds = new List<int>();
 
-            foreach (Dictionary<string, string> tagsID in tagIdsRaw) {
+            foreach (Dictionary<string, string> tagsID in tagIdsRaw)
+            {
                 string value = "";
                 var values = tagsID.TryGetValue("tag_id", out value);
                 tagIds.Add(Convert.ToInt16(value));
@@ -86,14 +119,14 @@ public class ExperienceController : ControllerBase
 
                 foreach (Dictionary<string, string> path in imagePathsRaw)
                 {
-                    newProject.Imagepaths.Add(path["image_path"]);    
+                    newProject.Imagepaths.Add(path["image_path"]);
                 }
 
                 experience.Projects.Add(newProject);
             }
-            
+
         }
 
-        return result;
+        return experiences;
     }
 }
