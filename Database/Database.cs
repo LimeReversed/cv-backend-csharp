@@ -67,102 +67,22 @@ namespace BackendCSharp.Database
         /// 
         /// </summary>
         /// <param name="query"></param>
-        /// <returns>The first row found from the query</returns>
-        static public Dictionary<string, string> GetFirstRow(string query, List<ColumnEntry> rowEntry = null)
-        {
-            using var connection = new SqliteConnection(connectionString);
-
-            using SqliteCommand command = new SqliteCommand(query, connection);
-            if (rowEntry != null) command.AddParameters(rowEntry);
-
-            Dictionary<string, string> columns = new Dictionary<string, string>();
-
-            try
-            {
-                connection.Open();
-                using var reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    for (int i = 0; i < reader.FieldCount; i++)
-                    {
-                        string columnName = reader.GetName(i);
-                        if (!columns.ContainsKey(columnName))
-                        {
-                            string value = reader.GetString(i);
-                            columns.Add(columnName, value);
-                        }
-                    }
-                }
-            }
-            catch (SqliteException e)
-            {
-                Debug.WriteLine(e.Message);
-            }
-
-            return columns;
-        }
-
-        static public Dictionary<string, string> GetFirstRow(string query, SqliteConnection connection, List<ColumnEntry> rowEntry = null, SqliteTransaction transaction = null)
-        {
-            using SqliteCommand command = new SqliteCommand(query, connection);
-            command.Transaction = transaction;
-
-            if (rowEntry != null) command.AddParameters(rowEntry);
-
-            Dictionary<string, string> columns = new Dictionary<string, string>();
-
-            using var reader = command.ExecuteReader();
-
-            while (reader.Read())
-            {
-                for (int i = 0; i < reader.FieldCount; i++)
-                {
-                    string columnName = reader.GetName(i);
-                    if (!columns.ContainsKey(columnName))
-                    {
-                        string value = reader.GetString(i);
-                        columns.Add(columnName, value);
-                    }
-                }
-            }           
-
-            return columns;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="query"></param>
         /// <returns>Return all rows found from the query</returns>
-        static public List<Dictionary<string, string>> GetRows(string query, List<ColumnEntry> rowEntry = null)
+        static public List<Dictionary<string, object>> GetRows(string query, List<ColumnEntry> rowEntry = null)
         {
             using var connection = new SqliteConnection(connectionString);
 
             using SqliteCommand command = new SqliteCommand(query, connection);
             if (rowEntry != null) command.AddParameters(rowEntry);
 
-            List<Dictionary<string, string>> rows = new List<Dictionary<string, string>>();
+            var rows = new List<Dictionary<string, object>>();
 
             try
             {
                 connection.Open();
                 using var reader = command.ExecuteReader();
 
-                while (reader.Read())
-                {
-
-                    Dictionary<string, string> row = new Dictionary<string, string>();
-
-                    for (int i = 0; i < reader.FieldCount; i++)
-                    {
-                        string columnName = reader.GetName(i);
-                        string value = reader.GetString(i);
-                        row.Add(columnName, value);
-                    }
-
-                    rows.Add(row);
-                }
+                rows = ReadRows(reader);
             }
             catch (SqliteException e)
             {
@@ -172,28 +92,94 @@ namespace BackendCSharp.Database
             return rows;
         }
 
-        static public List<Dictionary<string, string>> GetRows(string query, SqliteConnection connection, List<ColumnEntry> rowEntry = null, SqliteTransaction transaction = null)
+        static public List<Dictionary<string, object>> GetRows(string query, SqliteConnection connection, List<ColumnEntry> rowEntry = null, SqliteTransaction transaction = null)
         {
             using SqliteCommand command = new SqliteCommand(query, connection);
             command.Transaction = transaction;
             if (rowEntry != null) command.AddParameters(rowEntry);
 
-            List<Dictionary<string, string>> rows = new List<Dictionary<string, string>>();
+            using var reader = command.ExecuteReader();
+
+            return ReadRows(reader);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns>Return all rows found from the query</returns>
+        static public Dictionary<long, List<long>> GetRelations(string query)
+        {
+            using var connection = new SqliteConnection(connectionString);
+            using SqliteCommand command = new SqliteCommand(query, connection);
+
+            var rows = new Dictionary<long, List<long>>();
+
+            try
+            {
+                connection.Open();
+                using var reader = command.ExecuteReader();
+
+                rows = ReadRelations(reader);
+            }
+            catch (SqliteException e)
+            {
+                Debug.WriteLine(e.Message);
+            }
+
+            return rows;
+        }
+
+        static public Dictionary<long, List<long>> GetRelations(string query, SqliteConnection connection, SqliteTransaction transaction = null)
+        {
+            using SqliteCommand command = new SqliteCommand(query, connection);
+            command.Transaction = transaction;
 
             using var reader = command.ExecuteReader();
 
+            return ReadRelations(reader);
+        }
+
+        static private List<Dictionary<string, object>> ReadRows(SqliteDataReader reader)
+        {
+            List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+
             while (reader.Read())
             {
-                Dictionary<string, string> row = new Dictionary<string, string>();
+                Dictionary<string, object> row = new Dictionary<string, object>();
 
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
                     string columnName = reader.GetName(i);
-                    string value = reader.GetString(i);
+                    object value = reader.GetValue(i);
                     row.Add(columnName, value);
                 }
 
                 rows.Add(row);
+            }
+
+
+            return rows;
+        }
+
+        static private Dictionary<long, List<long>> ReadRelations(SqliteDataReader reader)
+        {
+            var rows = new Dictionary<long, List<long>>();
+
+            while (reader.Read())
+            {
+                
+                long parentId = reader.GetInt64(0);
+                long childId = reader.GetInt64(1);
+
+                if (rows.ContainsKey(parentId))
+                {
+                    rows[parentId].Add(childId);
+                }
+                else
+                {
+                    rows.Add(parentId, new List<long> { childId });
+                }
             }
 
 

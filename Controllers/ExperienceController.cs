@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using BackendCSharp.Models;
 using BackendCSharp.Database;
-using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace BackendCSharp.Controllers;
 
@@ -18,114 +16,59 @@ public class ExperienceController : ControllerBase
     }
 
     [HttpGet()]
-    public IEnumerable<Experience> Get()
+    public List<Experience> Get()
     {
-        string query = "SELECT * FROM Experience";
-        return GetExperience(query);
+        var experience = ExperienceRepository.GetAll();
+        return PackageExperience(experience);
 
     }
 
     [HttpGet("jobs")]
-    public IEnumerable<Experience> GetJobs()
+    public List<Experience> GetJobs()
     {
-        string query = "SELECT * FROM Experience WHERE type = 'Job'";
-        return GetExperience(query);
+        var experience = ExperienceRepository.GetJobs();
+        return PackageExperience(experience);
         
     }
 
     [HttpGet("education")]
-    public IEnumerable<Experience> GetEducation()
+    public List<Experience> GetEducation()
     {
-        string query = "SELECT * FROM Experience WHERE type = 'Education'";
-        return GetExperience(query);
+        var experience = ExperienceRepository.GetEducation();
+        return PackageExperience(experience);
 
     }
 
     [HttpGet("hobbies")]
-    public IEnumerable<Experience> GetHobbies()
+    public List<Experience> GetHobbies()
     {
-        string query = "SELECT * FROM Experience WHERE type = 'Hobbies'";
-        return GetExperience(query);
+        var experience = ExperienceRepository.GetHobbies();
+        return PackageExperience(experience);
 
     }
 
-    private IEnumerable<Experience> GetExperience()
+    private List<Experience> PackageExperience(List<Experience> experience)
     {
-        // Gere there should be no queries or anything pointing to database, that's now repository. 
         var experiences = ExperienceRepository.GetAll();
-        List<int> experienceIds = (List<int>)experiences.Select(x => x.Id);
+        var experienceIds = experiences.Select(x => x.Id).ToList();
+        
+        var projectsByExperienceIds = ProjectRepository.GetByExperienceIds(experienceIds);
+        var tagsByExperienceIds = TagRepository.GetByExperienceIds(experienceIds);
 
-        // Maybe a join so I can get the project and experience_id in the same row? 
-        string projectIdsQuery = $"SELECT * FROM ExperienceXProjects WHERE experience_id IN ({experienceIds.AsString()})";
+        var projectIds = projectsByExperienceIds.SelectMany(keyValuePair => keyValuePair.Value).Select(project => project.Id).ToList();
+        var imagePathsByProjectIds = ImagePathRepository.GetByProjectIds(projectIds);
 
-        foreach (Experience experience in experiences)
+        foreach (Experience ex in experiences)
         {
-            //string projectIdsQuery = $"SELECT project_id FROM ExperienceXProjects WHERE experience_id={experience.Id}";
-            var projectIDsRaw = Db.GetRows(projectIdsQuery);
-            // Need a wherein statement, but I can't just put a dic<string, string> there I need them separated by comma. 
+            // Some experiences don't have projects, so some experienceIDs will not be in represented in projectsByExperienceIds.
+            // So we first need to check if the projectsByExperienceIds dictionary contains that experienceId. 
+            if (projectsByExperienceIds.ContainsKey(ex.Id)) { ex.Projects = projectsByExperienceIds[ex.Id]; }
+            if (tagsByExperienceIds.ContainsKey(ex.Id)) { ex.Tags = tagsByExperienceIds[ex.Id]; }
 
-            // Kan ha contructFromDb som tar dictionary och gör det till ett object. 
-            // Behöver isf ett sätt att bara ta ut ID. Göra en separat get? Hur styr jag isf att det är rätt select statement?
-            // Eller ha en metod som tar ut en kolumn från dict och tar värdena på det? Behöver isf convertera det. 
-
-            // Lägga in värdena i kontruktorn direkt när vi tar detfrån databasen? Kan det lätt bli fel om jag lägger till en kolumn?
-
-            // Problemet nu är väl snarare att List inte kommer. 
-
-            // Jag kan göra metod för att convertera till instans, men när det är en lista? Var lägger jag den koden?
-
-            // Ha repository? GetByID? Och så en repository för varje Model.Då kan jag få ett färdig objekt direkt. Men återigen, hur göra om lista av objekt?
-
-            //Project[] projects = new Project[];
-
-            List<int> projectIDs = new List<int>();
-
-            foreach (Dictionary<string, string> projectID in projectIDsRaw)
+            foreach (Project project in ex.Projects)
             {
-                string value = "";
-                var values = projectID.TryGetValue("project_id", out value);
-                projectIDs.Add(Convert.ToInt16(value));
+                if (imagePathsByProjectIds.ContainsKey(project.Id)) { project.Imagepaths = imagePathsByProjectIds[project.Id]; }
             }
-
-            string projectsQuery = $"SELECT * FROM Projects WHERE id IN ({projectIDs.AsString()})";
-            var projectsRaw = Db.GetRows(projectsQuery);
-
-            string tagsIdsQuery = $"SELECT tag_id FROM ExperienceXTags WHERE experience_id = {experience.Id}";
-            var tagIdsRaw = Db.GetRows(tagsIdsQuery);
-
-            List<int> tagIds = new List<int>();
-
-            foreach (Dictionary<string, string> tagsID in tagIdsRaw)
-            {
-                string value = "";
-                var values = tagsID.TryGetValue("tag_id", out value);
-                tagIds.Add(Convert.ToInt16(value));
-            }
-
-            string tagsQuery = $"SELECT * FROM Tags WHERE id IN ({tagIds.AsString()})";
-            var tagsRaw = Db.GetRows(tagsQuery);
-
-            foreach (Dictionary<string, string> tag in tagsRaw)
-            {
-                experience.Tags.Add(new Tag(Convert.ToInt16(tag["id"]), tag["name"], Convert.ToInt16(tag["level"]), tag["category"]));
-            }
-
-
-            foreach (Dictionary<string, string> project in projectsRaw)
-            {
-                var newProject = new Project(Convert.ToInt16(project["id"]), project["name"], project["description"], new List<string>(), project["link"]);
-
-                string imagePathQuery = $"SELECT image_path FROM ProjectsXImagePaths WHERE project_id = {project["id"]}";
-                var imagePathsRaw = Db.GetRows(imagePathQuery);
-
-                foreach (Dictionary<string, string> path in imagePathsRaw)
-                {
-                    newProject.Imagepaths.Add(path["image_path"]);
-                }
-
-                experience.Projects.Add(newProject);
-            }
-
         }
 
         return experiences;

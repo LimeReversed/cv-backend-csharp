@@ -8,7 +8,7 @@ public class ExperienceRepository
     {
         var resultRaw = Db.GetRows("SELECT * FROM Experience");
         var result = new List<Experience>();
-        foreach (Dictionary<string, string> row in resultRaw)
+        foreach (Dictionary<string, object> row in resultRaw)
         {
             result.Add(new Experience(row));
         }
@@ -21,7 +21,7 @@ public class ExperienceRepository
     {
         var resultRaw = Db.GetRows($"SELECT * FROM Experience WHERE id IN ({ids.AsString()})");
         var result = new List<Experience>();
-        foreach (Dictionary<string, string> row in resultRaw)
+        foreach (Dictionary<string, object> row in resultRaw)
         {
             result.Add(new Experience(row));
         }
@@ -34,7 +34,7 @@ public class ExperienceRepository
     {
         var resultRaw = Db.GetRows("SELECT * FROM Experience WHERE type = 'Job'");
         var result = new List<Experience>();
-        foreach (Dictionary<string, string> row in resultRaw)
+        foreach (Dictionary<string, object> row in resultRaw)
         {
             result.Add(new Experience(row));
         }
@@ -47,7 +47,7 @@ public class ExperienceRepository
     {
         var resultRaw = Db.GetRows("SELECT * FROM Experience WHERE type = 'Education'");
         var result = new List<Experience>();
-        foreach (Dictionary<string, string> row in resultRaw)
+        foreach (Dictionary<string, object> row in resultRaw)
         {
             result.Add(new Experience(row));
         }
@@ -60,7 +60,7 @@ public class ExperienceRepository
     {
         var resultRaw = Db.GetRows("SELECT * FROM Experience WHERE type = 'Hobby'");
         var result = new List<Experience>();
-        foreach (Dictionary<string, string> row in resultRaw)
+        foreach (Dictionary<string, object> row in resultRaw)
         {
             result.Add(new Experience(row));
         }
