@@ -49,9 +49,10 @@ public class ExperienceController : ControllerBase
 
     }
 
-    private IEnumerable<Experience> GetExperience(string query)
+    private IEnumerable<Experience> GetExperience()
     {
-        var experiences = ExperienceRepository.GetByQuery(query);
+        // Gere there should be no queries or anything pointing to database, that's now repository. 
+        var experiences = ExperienceRepository.GetAll();
         List<int> experienceIds = (List<int>)experiences.Select(x => x.Id);
 
         // Maybe a join so I can get the project and experience_id in the same row? 
