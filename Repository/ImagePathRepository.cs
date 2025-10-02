@@ -3,6 +3,8 @@ using BackendCSharp;
 
 public class ImagePathRepository
 {
+    /// <param name="projectIds"></param>
+    /// <returns>A Dictionary where the key represents a projectId and the value is a list of image paths that belong to that project</returns>
     static public Dictionary<long, List<string>> GetByProjectIds(List<long> projectIds)
     {
         List<Dictionary<string, object>> resultRaw = Db.GetRows($"SELECT * FROM ProjectXImagePaths WHERE project_id IN ({projectIds.AsString()})");

@@ -4,6 +4,11 @@ namespace BackendCSharp;
 
 public static class Extensions
 {
+    /// <typeparam name="T"></typeparam>
+    /// <param name="list"></param>
+    /// <param name="separator"></param>
+    /// <param name="surrounder"></param>
+    /// <returns>One string containing the items of the list separated by whatever seperator is set to, which is a comma by default.</returns>
     public static string AsString<T>(this List<T> list, string separator = ",", string surrounder = null)
     {
         StringBuilder builder = new StringBuilder();

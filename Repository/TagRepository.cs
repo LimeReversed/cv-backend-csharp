@@ -17,9 +17,9 @@ public class TagRepository
 
     }
 
-    static public List<Tag> GetByIds(List<long> ids)
+    static public List<Tag> GetByIds(List<long> tagIds)
     {
-        var resultRaw = Db.GetRows($"SELECT * FROM Tags WHERE id IN ({ids.AsString()})");
+        var resultRaw = Db.GetRows($"SELECT * FROM Tags WHERE id IN ({tagIds.AsString()})");
         var result = new List<Tag>();
         foreach (Dictionary<string, object> row in resultRaw)
         {
@@ -30,6 +30,8 @@ public class TagRepository
 
     }
 
+    /// <param name="experienceIds"></param>
+    /// <returns>A Dictionary where the key represents an experienceId and the value is a list of tags that belong to that experience</returns>
     static public Dictionary<long, List<Tag>> GetByExperienceIds(List<long> experienceIds)
     {
         string query = $"SELECT Tags.*, ExperienceXTags.experience_id FROM Tags JOIN ExperienceXTags ON Tags.id = ExperienceXTags.tag_id WHERE ExperienceXTags.experience_id IN ({experienceIds.AsString()})";

@@ -62,10 +62,6 @@ namespace BackendCSharp.Database
             }
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="query"></param>
         /// <returns>Return all rows found from the query</returns>
         static public List<Dictionary<string, object>> GetRows(string query, List<ColumnEntry> rowEntry = null)
@@ -92,6 +88,11 @@ namespace BackendCSharp.Database
             return rows;
         }
 
+        /// <summary>
+        /// Executes a query as a part of an existing connection, and optionally as a part of a transaction. 
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns>Return all rows found from the query</returns>
         static public List<Dictionary<string, object>> GetRows(string query, SqliteConnection connection, List<ColumnEntry> rowEntry = null, SqliteTransaction transaction = null)
         {
             using SqliteCommand command = new SqliteCommand(query, connection);
@@ -104,14 +105,18 @@ namespace BackendCSharp.Database
         }
 
         /// <summary>
-        /// 
+        /// A method made to show the relationship between two entities. 
         /// </summary>
-        /// <param name="query"></param>
-        /// <returns>Return all rows found from the query</returns>
-        static public Dictionary<long, List<long>> GetRelations(string query)
+        /// <param name="relationTableQuery">This method expects a query on a relationship table. One example is the ExperienceXProjects table 
+        /// that contains a column for experienceId and another column for projectid.</param>
+        /// <returns>
+        /// Returns a Dictionary where the key represents the parent id and the value is a list of child ids.
+        /// For example if an Experience contains several projects, then we have experienceId as a key, then a list of projectIds as value.
+        /// </returns>
+        static public Dictionary<long, List<long>> GetRelations(string relationTableQuery)
         {
             using var connection = new SqliteConnection(connectionString);
-            using SqliteCommand command = new SqliteCommand(query, connection);
+            using SqliteCommand command = new SqliteCommand(relationTableQuery, connection);
 
             var rows = new Dictionary<long, List<long>>();
 
@@ -130,9 +135,18 @@ namespace BackendCSharp.Database
             return rows;
         }
 
-        static public Dictionary<long, List<long>> GetRelations(string query, SqliteConnection connection, SqliteTransaction transaction = null)
+        /// <summary>
+        /// A method made to show the relationship between two entities. It executes a query as a part of an existing connection, and optionally as a part of a transaction. 
+        /// </summary>
+        /// <param name="relationTableQuery">This method expects a query on a relationship table. One example is the ExperienceXProjects table 
+        /// that contains a column for experienceId and another column for projectid.</param>
+        /// <returns>
+        /// Returns a Dictionary where the key represents the parent id and the value is a list of child ids.
+        /// For example if an Experience contains several projects, then we have experienceId as a key, then a list of projectIds as value.
+        /// </returns>
+        static public Dictionary<long, List<long>> GetRelations(string relationTableQuery, SqliteConnection connection, SqliteTransaction transaction = null)
         {
-            using SqliteCommand command = new SqliteCommand(query, connection);
+            using SqliteCommand command = new SqliteCommand(relationTableQuery, connection);
             command.Transaction = transaction;
 
             using var reader = command.ExecuteReader();

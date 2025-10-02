@@ -49,6 +49,14 @@ public class ExperienceController : ControllerBase
 
     private List<Experience> PackageExperience(List<Experience> experience)
     {
+        /*
+         * I debated whether to add a transaction for all of these calls to the database. 
+         * The reason being that experience, projects and image paths are all connected, and what if one changes after getting one but before getting the other?
+         * There is a risk for dirty reads. I could start a transaction here, but a controller or a repository call should not care about the implementation of the storage. 
+         * Therefore I can only have code that is connected to the sqlite database inside of repositories. I could call everything I need inside of the ExperienceRepository, but then
+         * I would repeat a lot of code that is in the other repositories. So Repository pattern seems to cause issues with transactions together with DRY (Don't repeat yourself).
+         */
+
         var experiences = ExperienceRepository.GetAll();
         var experienceIds = experiences.Select(x => x.Id).ToList();
         
