@@ -44,8 +44,8 @@ namespace BackendCSharp.Database
 
     public static class Db
     {
-        static public string connectionString = @"Data Source = E:\Programs\CV\backend-c#\Database\ResumeDatabase.db3";
-        //static public string connectionString = @"Data Source = C:\Emil\Backup\Programs\CV\cv-backend-csharp\Database\ResumeDatabase.db3";
+        //static public string connectionString = @"Data Source = E:\Programs\CV\backend-c#\Database\ResumeDatabase.db3";
+        static public string connectionString = @"Data Source = C:\Emil\Backup\Programs\CV\cv-backend-csharp\Database\ResumeDatabase.db3";
 
         /// <summary>
         /// Adds parameters to the existing command.
@@ -172,7 +172,6 @@ namespace BackendCSharp.Database
                 rows.Add(row);
             }
 
-
             return rows;
         }
 
@@ -195,7 +194,6 @@ namespace BackendCSharp.Database
                     rows.Add(parentId, new List<long> { childId });
                 }
             }
-
 
             return rows;
         }
