@@ -1,26 +1,28 @@
+using Microsoft.Data.Sqlite;
+
 public class Project
 {
-    public Project(long id, string name, string description, List<string> imagepaths, string link)
+    public Project(long id, string name, string description, string link, List<ImagePath> imagepaths)
     {
         Id = id;
         Name = name;
         Description = description;
-        Imagepaths = imagepaths;
         Link = link;
+        Imagepaths = imagepaths;
     }
 
-    public Project(Dictionary<string, object> row)
+    public Project(SqliteDataReader reader)
     {
-        Id = (long)row["id"];
-        Name = (string)row["name"];
-        Description = (string)row["description"];
-        Imagepaths = new List<string>();
-        Link = (string)row["link"];
+        Id = reader.GetFieldValue<long>(reader.GetOrdinal("id"));
+        Name = reader.GetFieldValue<string>(reader.GetOrdinal("name"));
+        Description = reader.GetFieldValue<string>(reader.GetOrdinal("description"));
+        Link = reader.GetFieldValue<string>(reader.GetOrdinal("link"));
+        Imagepaths = new List<ImagePath>();
     }
 
     public long Id { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
-    public List<string> Imagepaths { get; set; }
     public string Link {  get; set; }
+    public List<ImagePath> Imagepaths { get; set; }
 }

@@ -6,35 +6,30 @@ using BackendCSharp.Models;
 
 public class ExperienceRepository
 {
-    private static DatabaseConverter<Experience > rowsConverter = new DatabaseConverter<Experience>();
+    private static DatabaseServiceTyped<Experience> databaseService = new DatabaseServiceTyped<Experience>();
 
     public static List<Experience> GetAll()
     {
-        var rows = Db.GetRows("SELECT * FROM Experience");
-        return rowsConverter.ToList(rows);
+        return databaseService.GetRows("SELECT * FROM Experience");
     }
 
     public static List<Experience> GetByIds(List<int> experienceIds)
     {
-        var rows = Db.GetRows($"SELECT * FROM Experience WHERE id IN ({experienceIds.AsString()})");
-        return rowsConverter.ToList(rows);
+        return databaseService.GetRows($"SELECT * FROM Experience WHERE id IN ({experienceIds.AsString()})");
     }
 
     public static List<Experience> GetJobs()
     {
-        var rows = Db.GetRows("SELECT * FROM Experience WHERE type = 'Job'");
-        return rowsConverter.ToList(rows);
+        return databaseService.GetRows("SELECT * FROM Experience WHERE type = 'Job'");
     }
 
     public static List<Experience> GetEducation()
     {
-        var rows = Db.GetRows("SELECT * FROM Experience WHERE type = 'Education'");
-        return rowsConverter.ToList(rows);
+        return databaseService.GetRows("SELECT * FROM Experience WHERE type = 'Education'");
     }
 
     public static List<Experience> GetHobbies()
     {
-        var rows = Db.GetRows("SELECT * FROM Experience WHERE type = 'Hobby'");
-        return rowsConverter.ToList(rows);
+        return databaseService.GetRows("SELECT * FROM Experience WHERE type = 'Hobby'");
     }
 }
