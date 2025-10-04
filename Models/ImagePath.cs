@@ -1,3 +1,6 @@
+using Microsoft.Data.Sqlite;
+using System.Xml.Linq;
+
 public class  ImagePath
 {
     public ImagePath(long projectId, string imagePath)
@@ -6,10 +9,10 @@ public class  ImagePath
         Path = imagePath;
     }
 
-    public ImagePath(Dictionary<string, object> row)
+    public ImagePath(SqliteDataReader reader)
     {
-        ProjectId = (long)row["project_id"];
-        Path = (string)row["image_path"];
+        ProjectId = reader.GetFieldValue<long>(reader.GetOrdinal("project_id"));
+        Path = reader.GetFieldValue<string>(reader.GetOrdinal("image_path"));
     }
 
     public long ProjectId { get; set; }
