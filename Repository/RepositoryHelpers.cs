@@ -15,7 +15,7 @@ public static class RepositoryHelpers
             var experienceIds = experience.Select(x => x.Id).ToList();
 
             connection.Open();
-            using var transaction = connection.BeginTransaction();
+            using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.Serializable);
             var projectsByExperienceIds = ProjectRepository.GetByExperienceIds(experienceIds);
             var tagsByExperienceIds = TagRepository.GetByExperienceIds(experienceIds);
 
