@@ -1,3 +1,5 @@
+namespace BackendCSharp.Repositories;
+
 using BackendCSharp;
 using BackendCSharp.Database;
 using BackendCSharp.Models;

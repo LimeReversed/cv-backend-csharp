@@ -1,4 +1,4 @@
-using Microsoft.Data.Sqlite;
+namespace BackendCSharp.Models;
 
 public class Project
 {

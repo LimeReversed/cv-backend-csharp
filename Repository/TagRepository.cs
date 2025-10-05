@@ -1,4 +1,5 @@
-using BackendCSharp;
+namespace BackendCSharp.Repositories;
+
 using BackendCSharp.Database;
 using BackendCSharp.Models;
 using Microsoft.Data.Sqlite;

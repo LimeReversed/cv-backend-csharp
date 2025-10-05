@@ -1,8 +1,8 @@
+namespace BackendCSharp.Controllers;
+
 using Microsoft.AspNetCore.Mvc;
 using BackendCSharp.Models;
 using BackendCSharp.Database;
-
-namespace BackendCSharp.Controllers;
 
 [ApiController]
 [Route("[controller]")]

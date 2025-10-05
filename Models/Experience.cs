@@ -1,7 +1,4 @@
-using Microsoft.Data.Sqlite;
-
 namespace BackendCSharp.Models;
-
 public class Experience
 {
     public Experience(long id, string title, string? orgName, string? location, string from, string? to, string? tldr, string description, string type, List<Tag> tags, List<Project> projects)
