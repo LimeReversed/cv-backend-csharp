@@ -4,11 +4,13 @@ using System.Diagnostics;
 
 namespace BackendCSharp.Repositories;
 
+using BackendCSharp.Database;
+
 public static class RepositoryHelpers
 {
     public static List<Experience> FillExperience(List<Experience> experience)
     {
-        using var connection = new SqliteConnection(@"Data Source = E:\Programs\CV\backend-c#\Database\ResumeDatabase.db3");
+        using var connection = new SqliteConnection(DatabaseServiceGeneric.connectionString);
         
         try
         {

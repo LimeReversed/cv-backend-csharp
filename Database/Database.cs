@@ -61,8 +61,7 @@ public static class DatabaseExtensionMethods
 
 public abstract class DatabaseServiceAbstract<T>
 {
-    protected string connectionString = @"Data Source = E:\Programs\CV\backend-c#\Database\ResumeDatabase.db3";
-    //protected string connectionString = @"Data Source = C:\Emil\Backup\Programs\CV\cv-backend-csharp\Database\ResumeDatabase.db3";
+    public static string connectionString = $"Data Source = {AppDomain.CurrentDomain.BaseDirectory}Database\\ResumeDatabase.db3";
 
     /// <param name="query"></param>
     /// <returns>Return all rows found from the query</returns>
