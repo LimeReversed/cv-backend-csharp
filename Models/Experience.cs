@@ -19,21 +19,6 @@ public class Experience
         Projects = projects;
     }
 
-    public Experience(SqliteDataReader reader)
-    {
-        Id = reader.GetFieldValue<long>(reader.GetOrdinal("id"));
-        Title = reader.GetFieldValue<string>(reader.GetOrdinal("title"));
-        OrgName = reader.GetFieldValue<string>(reader.GetOrdinal("org_name"));
-        Location = reader.GetFieldValue<string>(reader.GetOrdinal("location"));
-        From = reader.GetFieldValue<string>(reader.GetOrdinal("from"));
-        To = reader.GetFieldValue<string>(reader.GetOrdinal("to"));
-        Tldr = reader.GetFieldValue<string>(reader.GetOrdinal("tldr"));
-        Description = reader.GetFieldValue<string>(reader.GetOrdinal("description"));
-        Type = reader.GetFieldValue<string>(reader.GetOrdinal("type"));
-        Tags = new List<Tag>();
-        Projects = new List<Project>();
-    }
-
     public long Id { get; set; }
     public string Title { get; set; }
     public string? OrgName { get; set; }

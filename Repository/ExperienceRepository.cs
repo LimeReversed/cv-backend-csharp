@@ -1,12 +1,28 @@
 using BackendCSharp;
 using BackendCSharp.Database;
 using BackendCSharp.Models;
+using Microsoft.Data.Sqlite;
 
 // https://stackoverflow.com/questions/6529611/c-sharp-create-new-t
 
 public class ExperienceRepository
 {
-    private static DatabaseServiceTyped<Experience> databaseService = new DatabaseServiceTyped<Experience>();
+    private static Func<SqliteDataReader, Experience> experienceFactory = (reader) => new Experience
+    (
+        reader.GetFieldValue<long>(reader.GetOrdinal("id")),
+        reader.GetFieldValue<string>(reader.GetOrdinal("title")),
+        reader.GetFieldValue<string>(reader.GetOrdinal("org_name")),
+        reader.GetFieldValue<string>(reader.GetOrdinal("location")),
+        reader.GetFieldValue<string>(reader.GetOrdinal("from")),
+        reader.GetFieldValue<string>(reader.GetOrdinal("to")),
+        reader.GetFieldValue<string>(reader.GetOrdinal("tldr")),
+        reader.GetFieldValue<string>(reader.GetOrdinal("description")),
+        reader.GetFieldValue<string>(reader.GetOrdinal("type")),
+        new List<Tag>(),
+        new List<Project>()
+    );
+
+    private static DatabaseServiceTyped<Experience> databaseService = new DatabaseServiceTyped<Experience>(experienceFactory);
 
     public static List<Experience> GetAll()
     {

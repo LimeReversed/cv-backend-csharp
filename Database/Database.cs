@@ -1,4 +1,6 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using BackendCSharp.Models;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Data.Sqlite;
 using System.Data;
 using System.Diagnostics;
 
@@ -137,13 +139,21 @@ namespace BackendCSharp.Database
 
     public class DatabaseServiceTyped<T> : DatabaseServiceAbstract<T>
     {
+        private Func<SqliteDataReader, T> modelFactory;
+
+        public DatabaseServiceTyped(Func<SqliteDataReader, T> modelFactory)
+        {
+            this.modelFactory = modelFactory;
+        }
+
+
         protected override List<T> ReadRows(SqliteDataReader reader)
         {
             var rows = new List<T>();
 
             while (reader.Read())
             {
-                var instance = (T)Activator.CreateInstance(typeof(T), reader);
+                T instance = modelFactory(reader);
                 if (instance != null) { rows.Add(instance); }
             }
 
@@ -158,8 +168,7 @@ namespace BackendCSharp.Database
             {
 
                 long parentId = reader.GetFieldValue<long>(parentIdName);
-                var instance = (T)Activator.CreateInstance(typeof(T), reader);
-
+                T instance = modelFactory(reader);
 
                 if (rows.ContainsKey(parentId))
                 {

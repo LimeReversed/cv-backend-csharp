@@ -11,15 +11,6 @@ public class Project
         Imagepaths = imagepaths;
     }
 
-    public Project(SqliteDataReader reader)
-    {
-        Id = reader.GetFieldValue<long>(reader.GetOrdinal("id"));
-        Name = reader.GetFieldValue<string>(reader.GetOrdinal("name"));
-        Description = reader.GetFieldValue<string>(reader.GetOrdinal("description"));
-        Link = reader.GetFieldValue<string>(reader.GetOrdinal("link"));
-        Imagepaths = new List<ImagePath>();
-    }
-
     public long Id { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
