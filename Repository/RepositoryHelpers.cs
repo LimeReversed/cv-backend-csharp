@@ -11,18 +11,18 @@ public static class RepositoryHelpers
     public static List<Experience> FillExperience(List<Experience> experience)
     {
         using var connection = new SqliteConnection(DatabaseServiceGeneric.connectionString);
+        Console.WriteLine(DatabaseServiceGeneric.connectionString);
         
-        try
-        {
+
             var experienceIds = experience.Select(x => x.Id).ToList();
 
             connection.Open();
             using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.Serializable);
-            var projectsByExperienceIds = ProjectRepository.GetByExperienceIds(experienceIds);
-            var tagsByExperienceIds = TagRepository.GetByExperienceIds(experienceIds);
+            var projectsByExperienceIds = ProjectRepository.GetByExperienceIds(experienceIds, connection, transaction);
+            var tagsByExperienceIds = TagRepository.GetByExperienceIds(experienceIds, connection, transaction);
 
             var projectIds = projectsByExperienceIds.SelectMany(keyValuePair => keyValuePair.Value).Select(project => project.Id).ToList();
-            var imagePathsByProjectIds = ImagePathRepository.GetByProjectIds(projectIds);
+            var imagePathsByProjectIds = ImagePathRepository.GetByProjectIds(projectIds, connection, transaction);
 
             foreach (Experience ex in experience)
             {
@@ -36,11 +36,6 @@ public static class RepositoryHelpers
                     if (imagePathsByProjectIds.ContainsKey(project.Id)) { project.Imagepaths = imagePathsByProjectIds[project.Id]; }
                 }
             }
-        }
-        catch (SqliteException e)
-        {
-            Debug.WriteLine(e.Message);
-        }
 
         return experience;
     }

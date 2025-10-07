@@ -1,8 +1,9 @@
 namespace BackendCSharp.Controllers;
 
-using Microsoft.AspNetCore.Mvc;
 using BackendCSharp.Models;
 using BackendCSharp.Repositories;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.Sqlite;
 
 [ApiController]
 [Route("[controller]")]
@@ -16,34 +17,79 @@ public class ExperienceController : ControllerBase
     }
 
     [HttpGet()]
-    public List<Experience> Get()
+    public IActionResult Get()
     {
-        var experience = ExperienceRepository.GetAll();
-        return RepositoryHelpers.FillExperience(experience);
+        List<Experience> result = new List<Experience>();
+
+        try
+        {
+            var experience = ExperienceRepository.GetAll();
+            result = RepositoryHelpers.FillExperience(experience);
+        }
+        catch(SqliteException e)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+        }
+
+        return StatusCode(StatusCodes.Status200OK, result);
 
     }
 
     [HttpGet("jobs")]
-    public List<Experience> GetJobs()
+    public IActionResult GetJobs()
     {
-        var experience = ExperienceRepository.GetJobs();
-        return RepositoryHelpers.FillExperience(experience);
+        List<Experience> result = new List<Experience>();
+
+        try
+        {
+            var experience = ExperienceRepository.GetJobs();
+            result = RepositoryHelpers.FillExperience(experience);
+        }
+        catch (SqliteException e)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+        }
+
+        return StatusCode(StatusCodes.Status200OK, result);
+   
         
     }
 
     [HttpGet("education")]
-    public List<Experience> GetEducation()
+    public IActionResult GetEducation()
     {
-        var experience = ExperienceRepository.GetEducation();
-        return RepositoryHelpers.FillExperience(experience);
+        List<Experience> result = new List<Experience>();
+
+        try
+        {
+            var experience = ExperienceRepository.GetEducation();
+            result = RepositoryHelpers.FillExperience(experience);
+        }
+        catch (SqliteException e)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+        }
+
+        return StatusCode(StatusCodes.Status200OK, result);
 
     }
 
     [HttpGet("hobbies")]
-    public List<Experience> GetHobbies()
+    public IActionResult GetHobbies()
     {
-        var experience = ExperienceRepository.GetHobbies();
-        return RepositoryHelpers.FillExperience(experience);
+        List<Experience> result = new List<Experience>();
+
+        try
+        {
+            var experience = ExperienceRepository.GetHobbies();
+            result = RepositoryHelpers.FillExperience(experience);
+        }
+        catch (SqliteException e)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+        }
+
+        return StatusCode(StatusCodes.Status200OK, result);
 
     }
 }

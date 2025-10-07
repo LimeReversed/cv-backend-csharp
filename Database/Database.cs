@@ -61,7 +61,7 @@ public static class DatabaseExtensionMethods
 
 public abstract class DatabaseServiceAbstract<T>
 {
-    public static string connectionString = $"Data Source = {AppDomain.CurrentDomain.BaseDirectory}Database\\ResumeDatabase.db3";
+    public static string connectionString = $"Data Source = {AppDomain.CurrentDomain.BaseDirectory}Database/ResumeDatabase.db3";
 
     /// <param name="query"></param>
     /// <returns>Return all rows found from the query</returns>
@@ -74,17 +74,9 @@ public abstract class DatabaseServiceAbstract<T>
 
         var rows = new List<T>();
 
-        try
-        {
-            connection.Open();
-            using var reader = command.ExecuteReader();
-
-            rows = ReadRows(reader);
-        }
-        catch (SqliteException e)
-        {
-            Debug.WriteLine(e.Message);
-        }
+        connection.Open();
+        using var reader = command.ExecuteReader();
+        rows = ReadRows(reader);
 
         return rows;
     }
