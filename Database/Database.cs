@@ -53,7 +53,7 @@ public static class DatabaseExtensionMethods
         for (int i = 0; i < rowEntry.Count; i++)
         {
             // Remember that the parameter name here must be the same as the one given in the command text. 
-            SqliteParameter parameter = new SqliteParameter(rowEntry[i].ParameterName, rowEntry[i].Value);
+            var parameter = new SqliteParameter(rowEntry[i].ParameterName, rowEntry[i].Value);
             command.Parameters.Add(parameter);
         }
     }
@@ -65,11 +65,11 @@ public abstract class DatabaseServiceAbstract<T>
 
     /// <param name="query"></param>
     /// <returns>Return all rows found from the query</returns>
-    public List<T> GetRows(string query, List<ColumnEntry> rowEntry = null)
+    public List<T> GetRows(string query, List<ColumnEntry>? rowEntry = null)
     {
         using var connection = new SqliteConnection(connectionString);
 
-        using SqliteCommand command = new SqliteCommand(query, connection);
+        using var command = new SqliteCommand(query, connection);
         if (rowEntry != null) command.AddParameters(rowEntry);
 
         var rows = new List<T>();
@@ -86,9 +86,9 @@ public abstract class DatabaseServiceAbstract<T>
     /// </summary>
     /// <param name="query"></param>
     /// <returns>Return all rows found from the query</returns>
-    public List<T> GetRows(string query, SqliteConnection connection, List<ColumnEntry> rowEntry = null, SqliteTransaction transaction = null)
+    public List<T> GetRows(string query, SqliteConnection connection, List<ColumnEntry>? rowEntry = null, SqliteTransaction? transaction = null)
     {
-        using SqliteCommand command = new SqliteCommand(query, connection);
+        using var command = new SqliteCommand(query, connection);
         command.Transaction = transaction;
         if (rowEntry != null) command.AddParameters(rowEntry);
 
@@ -104,11 +104,11 @@ public class DatabaseServiceGeneric : DatabaseServiceAbstract<Dictionary<string,
 {
     protected override List<Dictionary<string, object>> ReadRows(SqliteDataReader reader)
     {
-        List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+        var rows = new List<Dictionary<string, object>>();
 
         while (reader.Read())
         {
-            Dictionary<string, object> row = new Dictionary<string, object>();
+            var row = new Dictionary<string, object>();
 
             for (int i = 0; i < reader.FieldCount; i++)
             {
@@ -163,7 +163,7 @@ public class DatabaseServiceTyped<T> : DatabaseServiceAbstract<T>
             }
             else
             {
-                rows.Add(parentId, new List<T> { instance });
+                rows.Add(parentId, [instance]);
             }
         }
 
@@ -183,7 +183,7 @@ public class DatabaseServiceTyped<T> : DatabaseServiceAbstract<T>
     public Dictionary<long, List<T>> GetRelations(string relationTableQuery, string keyColumnName)
     {
         using var connection = new SqliteConnection(connectionString);
-        using SqliteCommand command = new SqliteCommand(relationTableQuery, connection);
+        using var command = new SqliteCommand(relationTableQuery, connection);
 
         var rows = new Dictionary<long, List<T>>();
 
@@ -212,9 +212,9 @@ public class DatabaseServiceTyped<T> : DatabaseServiceAbstract<T>
     /// Returns a Dictionary where the key represents the parent id and the value is a list of child ids.
     /// For example if an Experience contains several projects, then we have experienceId as a key, then a list of projectIds as value.
     /// </returns>
-    public Dictionary<long, List<T>> GetRelations(string relationTableQuery, string keyColumnName, SqliteConnection connection, SqliteTransaction transaction = null)
+    public Dictionary<long, List<T>> GetRelations(string relationTableQuery, string keyColumnName, SqliteConnection connection, SqliteTransaction? transaction = null)
     {
-        using SqliteCommand command = new SqliteCommand(relationTableQuery, connection);
+        using var command = new SqliteCommand(relationTableQuery, connection);
         command.Transaction = transaction;
 
         using var reader = command.ExecuteReader();
@@ -225,6 +225,6 @@ public class DatabaseServiceTyped<T> : DatabaseServiceAbstract<T>
 
 public static class Db
 {
-    public static DatabaseServiceGeneric genericDatabaseService = new DatabaseServiceGeneric();
+    public static DatabaseServiceGeneric genericDatabaseService = new();
 }
 

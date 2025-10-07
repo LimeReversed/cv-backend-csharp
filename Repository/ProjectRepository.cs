@@ -38,7 +38,7 @@ public class ProjectRepository
 
     /// <param name="experienceIds"></param>
     /// <returns>A Dictionary where the key represents an experienceId and the value is a list of projects that belong to that experience</returns>
-    internal static Dictionary<long, List<Project>> GetByExperienceIds(List<long> experienceIds, SqliteConnection connection, SqliteTransaction transaction = null)
+    internal static Dictionary<long, List<Project>> GetByExperienceIds(List<long> experienceIds, SqliteConnection connection, SqliteTransaction? transaction = null)
     {
         string query = $"SELECT Projects.*, ExperienceXProjects.experience_id FROM Projects JOIN ExperienceXProjects ON Projects.id = ExperienceXProjects.project_id WHERE ExperienceXProjects.experience_id IN ({experienceIds.AsString()})";
         return databaseService.GetRelations(query, "experience_id", connection, transaction);
