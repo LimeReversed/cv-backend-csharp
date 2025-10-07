@@ -1,9 +1,9 @@
+namespace BackendCSharp.Repositories;
+
 using BackendCSharp;
 using BackendCSharp.Database;
 using BackendCSharp.Models;
 using Microsoft.Data.Sqlite;
-
-// https://stackoverflow.com/questions/6529611/c-sharp-create-new-t
 
 public class ExperienceRepository
 {

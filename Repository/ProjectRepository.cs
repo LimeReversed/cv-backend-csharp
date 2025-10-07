@@ -1,3 +1,5 @@
+namespace BackendCSharp.Repositories;
+
 using BackendCSharp;
 using BackendCSharp.Database;
 using BackendCSharp.Models;
@@ -14,7 +16,7 @@ public class ProjectRepository
     new List<ImagePath>()
 );
 
-    private static DatabaseServiceTyped<Project> databaseService = new DatabaseServiceTyped<Project>(projectFactory);
+    internal static DatabaseServiceTyped<Project> databaseService = new DatabaseServiceTyped<Project>(projectFactory);
 
     public static List<Project> GetAll()
     {
@@ -32,5 +34,13 @@ public class ProjectRepository
     {
         string query = $"SELECT Projects.*, ExperienceXProjects.experience_id FROM Projects JOIN ExperienceXProjects ON Projects.id = ExperienceXProjects.project_id WHERE ExperienceXProjects.experience_id IN ({experienceIds.AsString()})";
         return databaseService.GetRelations(query, "experience_id");
+    }
+
+    /// <param name="experienceIds"></param>
+    /// <returns>A Dictionary where the key represents an experienceId and the value is a list of projects that belong to that experience</returns>
+    internal static Dictionary<long, List<Project>> GetByExperienceIds(List<long> experienceIds, SqliteConnection connection, SqliteTransaction transaction = null)
+    {
+        string query = $"SELECT Projects.*, ExperienceXProjects.experience_id FROM Projects JOIN ExperienceXProjects ON Projects.id = ExperienceXProjects.project_id WHERE ExperienceXProjects.experience_id IN ({experienceIds.AsString()})";
+        return databaseService.GetRelations(query, "experience_id", connection, transaction);
     }
 }

@@ -1,5 +1,4 @@
-using Microsoft.Data.Sqlite;
-using System.Xml.Linq;
+namespace BackendCSharp.Models;
 
 public class  ImagePath
 {

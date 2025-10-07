@@ -1,8 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
-using BackendCSharp.Models;
-using BackendCSharp.Database;
-
 namespace BackendCSharp.Controllers;
+
+using BackendCSharp.Models;
+using BackendCSharp.Repositories;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.Sqlite;
 
 [ApiController]
 [Route("[controller]")]
@@ -16,68 +17,79 @@ public class ExperienceController : ControllerBase
     }
 
     [HttpGet()]
-    public List<Experience> Get()
+    public IActionResult Get()
     {
-        var experience = ExperienceRepository.GetAll();
-        return PackageExperience(experience);
+        List<Experience> result = new List<Experience>();
+
+        try
+        {
+            var experience = ExperienceRepository.GetAll();
+            result = RepositoryHelpers.FillExperience(experience);
+        }
+        catch(SqliteException e)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+        }
+
+        return StatusCode(StatusCodes.Status200OK, result);
 
     }
 
     [HttpGet("jobs")]
-    public List<Experience> GetJobs()
+    public IActionResult GetJobs()
     {
-        var experience = ExperienceRepository.GetJobs();
-        return PackageExperience(experience);
+        List<Experience> result = new List<Experience>();
+
+        try
+        {
+            var experience = ExperienceRepository.GetJobs();
+            result = RepositoryHelpers.FillExperience(experience);
+        }
+        catch (SqliteException e)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+        }
+
+        return StatusCode(StatusCodes.Status200OK, result);
+   
         
     }
 
     [HttpGet("education")]
-    public List<Experience> GetEducation()
+    public IActionResult GetEducation()
     {
-        var experience = ExperienceRepository.GetEducation();
-        return PackageExperience(experience);
+        List<Experience> result = new List<Experience>();
+
+        try
+        {
+            var experience = ExperienceRepository.GetEducation();
+            result = RepositoryHelpers.FillExperience(experience);
+        }
+        catch (SqliteException e)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+        }
+
+        return StatusCode(StatusCodes.Status200OK, result);
 
     }
 
     [HttpGet("hobbies")]
-    public List<Experience> GetHobbies()
+    public IActionResult GetHobbies()
     {
-        var experience = ExperienceRepository.GetHobbies();
-        return PackageExperience(experience);
+        List<Experience> result = new List<Experience>();
 
-    }
-
-    private List<Experience> PackageExperience(List<Experience> experience)
-    {
-        /*
-         * I debated whether to add a transaction for these calls to the database. 
-         * The reason being that experience, projects and image paths are all connected, and what if one changes after getting one but before getting the other?
-         * There is a risk for dirty reads. I could start a transaction here, but a controller or a repository call should not care about the implementation of the storage. 
-         * Therefore I can only have code that is connected to the sqlite database inside of repositories. I could call everything I need inside of the ExperienceRepository, but then
-         * I would repeat a lot of code that is in the other repositories. So Repository pattern seems to cause issues with transactions together with DRY (Don't repeat yourself).
-         */
-
-        var experienceIds = experience.Select(x => x.Id).ToList();
-        
-        var projectsByExperienceIds = ProjectRepository.GetByExperienceIds(experienceIds);
-        var tagsByExperienceIds = TagRepository.GetByExperienceIds(experienceIds);
-
-        var projectIds = projectsByExperienceIds.SelectMany(keyValuePair => keyValuePair.Value).Select(project => project.Id).ToList();
-        var imagePathsByProjectIds = ImagePathRepository.GetByProjectIds(projectIds);
-
-        foreach (Experience ex in experience)
+        try
         {
-            // Some experiences don't have projects, so some experienceIDs will not be in represented in projectsByExperienceIds.
-            // So we first need to check if the projectsByExperienceIds dictionary contains that experienceId. 
-            if (projectsByExperienceIds.ContainsKey(ex.Id)) { ex.Projects = projectsByExperienceIds[ex.Id]; }
-            if (tagsByExperienceIds.ContainsKey(ex.Id)) { ex.Tags = tagsByExperienceIds[ex.Id]; }
-
-            foreach (Project project in ex.Projects)
-            {
-                if (imagePathsByProjectIds.ContainsKey(project.Id)) { project.Imagepaths = imagePathsByProjectIds[project.Id]; }
-            }
+            var experience = ExperienceRepository.GetHobbies();
+            result = RepositoryHelpers.FillExperience(experience);
+        }
+        catch (SqliteException e)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
         }
 
-        return experience;
+        return StatusCode(StatusCodes.Status200OK, result);
+
     }
 }

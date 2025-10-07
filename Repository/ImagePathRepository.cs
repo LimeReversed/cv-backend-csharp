@@ -1,3 +1,5 @@
+namespace BackendCSharp.Repositories;
+
 using BackendCSharp;
 using BackendCSharp.Database;
 using BackendCSharp.Models;
@@ -11,7 +13,7 @@ public class ImagePathRepository
         reader.GetFieldValue<string>(reader.GetOrdinal("image_path"))
     );
 
-    private static DatabaseServiceTyped<ImagePath> databaseService = new DatabaseServiceTyped<ImagePath>(imagePathFactory);
+    internal static DatabaseServiceTyped<ImagePath> databaseService = new DatabaseServiceTyped<ImagePath>(imagePathFactory);
 
     /// <param name="projectIds"></param>
     /// <returns>A Dictionary where the key represents a projectId and the value is a list of image paths that belong to that project</returns>
@@ -19,5 +21,13 @@ public class ImagePathRepository
     {
         string query = $"SELECT * FROM ProjectXImagePaths WHERE project_id IN ({projectIds.AsString()})";
         return databaseService.GetRelations(query, "project_id");
+    }
+
+    /// <param name="projectIds"></param>
+    /// <returns>A Dictionary where the key represents a projectId and the value is a list of image paths that belong to that project</returns>
+    internal static Dictionary<long, List<ImagePath>> GetByProjectIds(List<long> projectIds, SqliteConnection connection, SqliteTransaction transaction = null)
+    {
+        string query = $"SELECT * FROM ProjectXImagePaths WHERE project_id IN ({projectIds.AsString()})";
+        return databaseService.GetRelations(query, "project_id", connection, transaction);
     }
 }
