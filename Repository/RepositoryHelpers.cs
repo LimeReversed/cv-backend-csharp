@@ -10,9 +10,7 @@ public static class RepositoryHelpers
 {
     public static List<Experience> FillExperience(List<Experience> experience)
     {
-        using var connection = new SqliteConnection(DatabaseServiceGeneric.connectionString);
-        Console.WriteLine(DatabaseServiceGeneric.connectionString);
-        
+        using var connection = new SqliteConnection(DatabaseServiceGeneric.connectionString);    
 
             var experienceIds = experience.Select(x => x.Id).ToList();
 

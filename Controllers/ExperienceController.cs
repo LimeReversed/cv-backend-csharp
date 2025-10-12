@@ -28,6 +28,7 @@ public class ExperienceController : ControllerBase
         }
         catch(SqliteException e)
         {
+            Console.WriteLine(e.Message);
             return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
         }
 
@@ -46,7 +47,7 @@ public class ExperienceController : ControllerBase
             result = RepositoryHelpers.FillExperience(experience);
         }
         catch (SqliteException e)
-        {
+        {   Console.WriteLine(e.Message);
             return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
         }
 
@@ -66,7 +67,7 @@ public class ExperienceController : ControllerBase
             result = RepositoryHelpers.FillExperience(experience);
         }
         catch (SqliteException e)
-        {
+        {   Console.WriteLine(e.Message);
             return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
         }
 
@@ -85,7 +86,7 @@ public class ExperienceController : ControllerBase
             result = RepositoryHelpers.FillExperience(experience);
         }
         catch (SqliteException e)
-        {
+        {   Console.WriteLine(e.Message);
             return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
         }
 
