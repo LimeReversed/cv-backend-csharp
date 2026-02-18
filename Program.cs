@@ -19,7 +19,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy =>
                       {
-                          policy.WithOrigins("http://localhost:5173", "http://92.33.158.78", "http://emilrundberg.se", "http://www.emilrundberg.se", "192.168.10.174");
+                          policy.WithOrigins("http://localhost:5173", "http://92.33.158.78", "http://emilrundberg.se", "http://www.emilrundberg.se", "192.168.10.174", "192.168.10.100");
                       });
 });
 
