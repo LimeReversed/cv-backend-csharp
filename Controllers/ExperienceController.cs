@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class ExperienceController : ControllerBase
 {
     private readonly ILogger<ExperienceController> _logger;
